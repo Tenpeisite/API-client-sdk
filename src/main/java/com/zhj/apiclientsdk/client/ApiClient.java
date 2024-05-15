@@ -12,8 +12,11 @@ import com.zhj.apiclientsdk.exception.BusinessException;
 import com.zhj.apiclientsdk.exception.ErrorCode;
 import com.zhj.apiclientsdk.model.User;
 import com.zhj.apiclientsdk.model.request.AddStuRequest;
+import com.zhj.apiclientsdk.model.request.ImageData;
+import com.zhj.apiclientsdk.model.request.QuestionRequest;
 import com.zhj.apiclientsdk.model.response.StuInfoResponse;
 import com.zhj.apiclientsdk.utis.SignUtils;
+import com.zhj.apiclientsdk.utis.UrlImageValidator;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -233,10 +236,132 @@ public class ApiClient {
         return result;
     }
 
+    public String doChat(Map<String, String> map) {
+        String question = map.get("question");
+        String assistantId = map.get("assistantId");
+
+        if (StringUtils.isAnyBlank(question)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "问题不能为空");
+        }
+        QuestionRequest questionRequest = new QuestionRequest();
+        questionRequest.setQuestion(question);
+        if (assistantId != null) {
+            questionRequest.setAssistantId(Long.valueOf(assistantId));
+        }
+
+        String json = JSONUtil.toJsonStr(questionRequest);
+        HttpResponse response = HttpRequest.post(GATEWAY_HOST + "/api/ai/dochat")
+                .body(json, "application/json;charset=UTF-8")
+                .addHeaders(getHeaderMap(json, "doChat"))
+                .execute();
+        String result = response.body();
+        return result;
+    }
+
+    public String doChat(QuestionRequest questionRequest) {
+        String question = questionRequest.getQuestion();
+        if (StringUtils.isAnyBlank(question)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "问题不能为空");
+        }
+
+        String json = JSONUtil.toJsonStr(questionRequest);
+        HttpResponse response = HttpRequest.post(GATEWAY_HOST + "/api/ai/dochat")
+                .body(json, "application/json;charset=UTF-8")
+                .addHeaders(getHeaderMap(json, "doChat"))
+                .execute();
+        String result = response.body();
+        return result;
+    }
+
+    public String doDraw(Map<String, String> map) {
+        String question = map.get("question");
+        String assistantId = map.get("assistantId");
+
+        if (StringUtils.isAnyBlank(question)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "问题不能为空");
+        }
+        QuestionRequest questionRequest = new QuestionRequest();
+        questionRequest.setQuestion(question);
+        questionRequest.setAssistantId(Long.valueOf(assistantId));
+        String json = JSONUtil.toJsonStr(questionRequest);
+        HttpResponse response = HttpRequest.post(GATEWAY_HOST + "/api/ai/draw")
+                .body(json, "application/json;charset=UTF-8")
+                .addHeaders(getHeaderMap(json, "doDraw"))
+                .execute();
+        String result = response.body();
+        return result;
+    }
+
+    public String doDraw(QuestionRequest questionRequest) {
+        String question = questionRequest.getQuestion();
+        if (StringUtils.isAnyBlank(question)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "问题不能为空");
+        }
+        String json = JSONUtil.toJsonStr(questionRequest);
+        HttpResponse response = HttpRequest.post(GATEWAY_HOST + "/api/ai/draw")
+                .body(json, "application/json;charset=UTF-8")
+                .addHeaders(getHeaderMap(json, "doDraw"))
+                .execute();
+        String result = response.body();
+        return result;
+    }
+
+    /**
+     * 通用图像识别
+     *
+     * @param bytes
+     * @return
+     */
+    public String textRecognition(byte[] bytes) {
+        HttpResponse response = HttpRequest.post(GATEWAY_HOST + "/api/ai/textRecognition")
+                .body(bytes)
+                .addHeaders(getHeaderMap(bytes.toString(), "textRecognition"))
+                .header("Content-Type", "application/octet-stream")
+                .execute();
+        String result = response.body();
+        return result;
+    }
+
+    /**
+     * 身份证识别
+     *
+     * @param bytes
+     * @return
+     */
+    public String idCardRecognition(byte[] bytes) {
+        HttpResponse response = HttpRequest.post(GATEWAY_HOST + "/api/ai/ocr/idcard")
+                .body(bytes)
+                .addHeaders(getHeaderMap(bytes.toString(), "idCardRecognition"))
+                .header("Content-Type", "application/octet-stream")
+                .execute();
+        String result = response.body();
+        return result;
+    }
+
+    /**
+     * 图像识别
+     *
+     * @param imageUrl
+     * @return
+     */
+    public String imageRecognition(String imageUrl) {
+        final boolean flag = UrlImageValidator.isImageUrl(imageUrl);
+        if (!flag) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        final ImageData imageData = new ImageData(imageUrl);
+        String json = JSONUtil.toJsonStr(imageData);
+        HttpResponse response = HttpRequest.post(GATEWAY_HOST + "/api/ai/imageRecognition")
+                .body(json, "application/json;charset=UTF-8")
+                .addHeaders(getHeaderMap(json, "imageRecognition"))
+                .execute();
+        String result = response.body();
+        return result;
+    }
+
 
     private Map getHeaderMap(String body, String methodName) {
         Map<String, String> hashmap = new HashMap<>();
-        hashmap.put("Content-Type", "application/json; charset=UTF-8");
         hashmap.put("accessKey", accessKey);
         //密钥不能发送给前端
         //hashmap.put("secretKey", secretKey);

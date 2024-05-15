@@ -34,8 +34,8 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiClient {
-    private static final String GATEWAY_HOST = "http://localhost:8090";
-    //private static final String GATEWAY_HOST = "http://api-gateway.tempeisite.xyz";
+    //private static final String GATEWAY_HOST = "http://localhost:8090";
+    private static final String GATEWAY_HOST = "http://api-gateway.tempeisite.xyz";
     private String accessKey;
     private String secretKey;
 

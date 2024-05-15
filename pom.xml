@@ -12,7 +12,7 @@
 
     <groupId>com.zhj</groupId>
     <artifactId>API-client-sdk</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.2-RELEASE</version>
     <name>API-client-sdk</name>
     <description>api-client-sdk</description>
     <properties>

@@ -275,14 +275,12 @@ public class ApiClient {
 
     public String doDraw(Map<String, String> map) {
         String question = map.get("question");
-        String assistantId = map.get("assistantId");
 
         if (StringUtils.isAnyBlank(question)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "问题不能为空");
         }
         QuestionRequest questionRequest = new QuestionRequest();
         questionRequest.setQuestion(question);
-        questionRequest.setAssistantId(Long.valueOf(assistantId));
         String json = JSONUtil.toJsonStr(questionRequest);
         HttpResponse response = HttpRequest.post(GATEWAY_HOST + "/api/ai/draw")
                 .body(json, "application/json;charset=UTF-8")
